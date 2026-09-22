@@ -1,0 +1,41 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Test and quality-tool artifacts
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment files and secrets
+.env
+.env.*
+!.env.example
+
+# Downloaded and generated data
+data/raw/
+data/interim/
+data/processed/
+data/cache/
+artifacts/
+models/
+mlruns/
+
+# Local infrastructure storage
+qdrant_storage/
+
+# Operating system and editor files
+.DS_Store
+.idea/
+.vscode/
