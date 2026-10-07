@@ -151,7 +151,7 @@ data/processed/techqa/queries.jsonl      Evaluation queries and reference answer
 data/processed/techqa/qrels.jsonl        Query-to-document relevance judgments
 data/processed/techqa/manifest.json      Dataset provenance and integrity metadata
 data/processed/techqa/indexes/*/          Index manifests and chunk artifacts
-qdrant_storage/                           Docker-mounted Qdrant server storage
+Docker volume resolverag_qdrant_data      Persistent Qdrant server storage
 reports/retrieval/*/                      Checkpoints, leaderboard, summary, winner
 ```
 

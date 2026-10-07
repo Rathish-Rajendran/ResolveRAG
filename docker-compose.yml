@@ -10,4 +10,7 @@ services:
     environment:
       QDRANT__TELEMETRY_DISABLED: "true"
     volumes:
-      - ./qdrant_storage:/qdrant/storage
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  qdrant_data:

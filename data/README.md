@@ -59,9 +59,9 @@ Contains the canonical representation of the dataset consumed by ResolveRAG.
 Processed records are created from the raw dataset through versioned transformation logic. Downstream components such as chunking, retrieval, indexing, and evaluation should consume the canonical processed representation rather than depend directly on the external dataset schema.
 
 Each index-build scope contains one chunk JSONL file per strategy, chunking
-statistics, and an index manifest. Vector data is stored by the local Qdrant
-server under the Docker-mounted `qdrant_storage/` directory; both locations are
-reproducible local artifacts ignored by Git.
+statistics, and an index manifest. Vector data is stored separately in the
+Docker-managed `resolverag_qdrant_data` volume; both sets of artifacts are
+reproducible and excluded from Git.
 
 ## Data Provenance
 

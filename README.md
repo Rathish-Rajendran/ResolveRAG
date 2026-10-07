@@ -97,8 +97,9 @@ indexes; questions, answers, and relevance judgments never do.
 - Docker Desktop, OrbStack, or another Docker-compatible runtime
 - Approximately 10 GB of free disk space for a full experiment
 
-Qdrant runs in a pinned Docker container with persistent storage. Its REST and gRPC ports are
-bound to `127.0.0.1`, preventing unauthenticated access from other machines on the network.
+Qdrant runs in a pinned Docker container with a Docker-managed persistent volume. Its REST and
+gRPC ports are bound to `127.0.0.1`, preventing unauthenticated access from other machines on the
+network. The managed volume also avoids the filesystem-caching risks of macOS bind mounts.
 
 ## Quick start
 
@@ -247,7 +248,7 @@ make test-unit
 ```text
 configs/                 Versioned dataset, index, retrieval, and evaluation settings
 data/README.md           Dataset contract, provenance, and leakage policy
-docker-compose.yml       Pinned, loopback-only Qdrant server
+docker-compose.yml       Pinned, loopback-only Qdrant server and managed volume
 docs/architecture.md     System boundaries and offline/online data flows
 src/resolverag/data/     Download, validation, normalization, and serialization
 src/resolverag/indexing/ Chunking, embedding, Qdrant indexing, and manifests
