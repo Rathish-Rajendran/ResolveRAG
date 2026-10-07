@@ -8,11 +8,9 @@ chunking strategies are crossed with six retrieval configurations, then compared
 document-level relevance metrics, latency, and reproducibility metadata. The entire stack runs
 locally with Python, LangChain, Ollama, and Qdrant.
 
-> **Project status:** ingestion, indexing, retrieval, and offline retrieval evaluation are
-> implemented. The full-corpus benchmark is intentionally run separately because it builds
-> roughly 30 experiment cells and can take several hours on a laptop. Generated-answer and
-> citation-faithfulness evaluation are the next milestone; the repository does not claim those
-> results yet.
+> **Project status:** ResolveRAG provides a complete, reproducible pipeline for TechQA ingestion,
+> multi-strategy chunking, Qdrant indexing, six retrieval configurations, and offline retrieval
+> evaluation.
 
 ## What this project demonstrates
 
