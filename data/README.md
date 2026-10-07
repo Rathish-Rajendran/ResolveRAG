@@ -28,6 +28,12 @@ data/
 │   └── techqa/
 ├── processed/
 │   └── techqa/
+│       ├── documents.jsonl
+│       ├── queries.jsonl
+│       ├── qrels.jsonl
+│       ├── indexes/
+│       │   ├── smoke_N/
+│       │   └── full/
 │       └── manifest.json
 └── README.md
 ```
@@ -51,6 +57,11 @@ These files are implementation artifacts and may be regenerated at any time.
 Contains the canonical representation of the dataset consumed by ResolveRAG.
 
 Processed records are created from the raw dataset through versioned transformation logic. Downstream components such as chunking, retrieval, indexing, and evaluation should consume the canonical processed representation rather than depend directly on the external dataset schema.
+
+Each index-build scope contains one chunk JSONL file per strategy, chunking
+statistics, and an index manifest. Vector data is stored separately under
+`qdrant_storage/`; both locations are reproducible local artifacts ignored by
+Git.
 
 ## Data Provenance
 
@@ -116,16 +127,16 @@ This keeps the repository lightweight while allowing the data to be reproduced f
 
 ## Regenerating the Dataset
 
-Dataset preparation will eventually be performed through the ResolveRAG CLI.
-
-The intended workflow will be similar to:
+Prepare the complete canonical dataset with:
 
 ```bash
-resolverag data download
-resolverag data prepare
-resolverag data validate
+uv run resolverag dataset prepare --config configs/datasets/techqa.yaml
 ```
 
-These commands will download the pinned dataset revision, validate the source artifacts, transform them into ResolveRAG's canonical representation, and generate the provenance manifest.
+The command downloads the pinned files when necessary, verifies their SHA-256
+checksums, validates the source schema, and produces `documents.jsonl`,
+`queries.jsonl`, `qrels.jsonl`, and `manifest.json` under
+`data/processed/techqa/`.
 
-Until the ingestion CLI is implemented, the dataset should not be manually downloaded, modified, or committed to the repository.
+Use `--no-download` to require that verified raw files already exist locally.
+Downloaded and generated data must not be manually modified or committed.

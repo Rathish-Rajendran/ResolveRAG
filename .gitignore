@@ -31,6 +31,7 @@ data/cache/
 artifacts/
 models/
 mlruns/
+reports/retrieval/smoke_*/
 
 # Local infrastructure storage
 qdrant_storage/

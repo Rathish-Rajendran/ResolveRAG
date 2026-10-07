@@ -1,0 +1,61 @@
+schema_version: 1
+
+inputs:
+  documents_file: data/processed/techqa/documents.jsonl
+  dataset_manifest_file: data/processed/techqa/manifest.json
+
+outputs:
+  directory: data/processed/techqa/indexes
+
+embedding:
+  provider: ollama
+  model: nomic-embed-text
+  base_url: http://127.0.0.1:11434
+  expected_dimensions: 768
+  document_prefix: "search_document: "
+  query_prefix: "search_query: "
+
+qdrant:
+  path: qdrant_storage
+  collection_prefix: resolverag_techqa
+  distance: cosine
+  embedding_batch_size: 64
+  upload_batch_size: 64
+
+tokenizer:
+  encoding_name: cl100k_base
+
+strategies:
+  fixed_256:
+    kind: token
+    chunk_size: 256
+    chunk_overlap: 32
+
+  fixed_512:
+    kind: token
+    chunk_size: 512
+    chunk_overlap: 64
+
+  recursive:
+    kind: recursive
+    chunk_size: 1800
+    chunk_overlap: 200
+    separators:
+      - "\n\n"
+      - "\n"
+      - ". "
+      - " "
+      - ""
+
+  sentence_window:
+    kind: sentence_window
+    window_size: 5
+    sentence_overlap: 1
+    max_sentence_characters: 1800
+
+  parent_child:
+    kind: parent_child
+    parent_chunk_size: 2400
+    parent_chunk_overlap: 200
+    child_chunk_size: 600
+    child_chunk_overlap: 80

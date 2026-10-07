@@ -19,6 +19,10 @@ source_files:
   questions: train.json
   corpus_archive: corpus.zip
 
+source_checksums:
+  train.json: 69d97231509482ed6bd5ec1c4bc0607acb82a88d11169eb8383592d0ca8b93c7
+  corpus.zip: c06aa287dcc1abf8db6b49b8495df095db73342d729f6451ac330785245d10be
+
 storage:
   raw_directory: data/raw/techqa
   interim_directory: data/interim/techqa

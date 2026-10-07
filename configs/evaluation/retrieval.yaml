@@ -1,0 +1,36 @@
+schema_version: 1
+
+inputs:
+  queries_file: data/processed/techqa/queries.jsonl
+  qrels_file: data/processed/techqa/qrels.jsonl
+  retrieval_config_file: configs/retrieval/local.yaml
+
+benchmark:
+  split: development
+  sample_size: 200
+  random_seed: 42
+  length_strata: 4
+  retrieval_depth: 50
+  cutoffs:
+    - 1
+    - 5
+    - 10
+  warmup_query: "How do I troubleshoot an IBM application service failure?"
+
+matrix:
+  chunking_strategies:
+    - fixed_256
+    - fixed_512
+    - recursive
+    - sentence_window
+    - parent_child
+  retrieval_configurations:
+    - bm25
+    - dense
+    - dense_mmr
+    - hybrid_rrf
+    - hybrid_weighted
+    - hybrid_rerank
+
+outputs:
+  directory: reports/retrieval
