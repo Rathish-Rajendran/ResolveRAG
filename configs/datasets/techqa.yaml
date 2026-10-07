@@ -1,0 +1,82 @@
+schema_version: 1
+
+dataset:
+  name: techqa_rag_eval
+  provider: huggingface
+  publisher: NVIDIA
+  repo_id: nvidia/TechQA-RAG-Eval
+  revision: 0b5bbc84b7f07d6d09d063130e90b716d8d4a32a
+  license: Apache-2.0
+  homepage: https://huggingface.co/datasets/nvidia/TechQA-RAG-Eval
+
+upstream:
+  name: TechQA
+  owner: IBM Research
+  repository: https://github.com/IBM/techqa
+  publication: https://research.ibm.com/publications/the-techqa-dataset
+
+source_files:
+  questions: train.json
+  corpus_archive: corpus.zip
+
+storage:
+  raw_directory: data/raw/techqa
+  interim_directory: data/interim/techqa
+  processed_directory: data/processed/techqa
+  manifest_file: data/processed/techqa/manifest.json
+
+source_schema:
+  question_id: id
+  question: question
+  reference_answer: answer
+  is_unanswerable: is_impossible
+  contexts: contexts
+  context:
+    document_id: filename
+    text: text
+
+logical_splits:
+  development:
+    id_prefix: TRAIN_
+    purpose: pipeline_development_and_configuration_selection
+
+  held_out:
+    id_prefix: DEV_
+    purpose: final_evaluation_only
+
+  unknown_prefix_policy: error
+
+normalization:
+  strip_outer_whitespace: true
+  normalize_newlines: true
+  reject_empty_document_ids: true
+  unanswerable:
+    source_answer: "-"
+    canonical_answer: null
+    canonical_relevant_documents: []
+
+validation:
+  expected_question_rows: 910
+  required_question_fields:
+    - id
+    - question
+    - answer
+    - is_impossible
+    - contexts
+
+  unique_fields:
+    - id
+
+  fail_on:
+    - duplicate_question_id
+    - missing_required_field
+    - empty_question
+    - answerable_question_without_context
+    - unanswerable_question_with_context
+    - unknown_logical_split
+
+provenance:
+  preserve_raw_files: true
+  checksum_algorithm: sha256
+  record_download_timestamp: true
+  record_library_versions: true
