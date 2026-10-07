@@ -19,7 +19,7 @@ locally with Python, LangChain, Ollama, and Qdrant.
   evaluation leakage
 - Five configurable chunking strategies, including parent-child retrieval
 - Six sparse, dense, hybrid, diversity-aware, and reranked retrieval configurations
-- Local embeddings through Ollama and isolated persistent Qdrant collections
+- Local embeddings through Ollama and isolated collections in a pinned Qdrant server
 - A resumable 5 × 6 experiment matrix with Recall@k, MRR@10, nDCG@10, and p50/p95 latency
 - Experiment manifests that record configuration, data, index, model, dependency, and Git
   provenance
@@ -94,10 +94,11 @@ indexes; questions, answers, and relevance judgments never do.
 - Python 3.12
 - [`uv` 0.11.24](https://docs.astral.sh/uv/)
 - [Ollama](https://ollama.com/) running locally
+- Docker Desktop, OrbStack, or another Docker-compatible runtime
 - Approximately 10 GB of free disk space for a full experiment
 
-Qdrant runs in embedded local mode, so a separate Qdrant server or Docker container is not
-required.
+Qdrant runs in a pinned Docker container with persistent storage. Its REST and gRPC ports are
+bound to `127.0.0.1`, preventing unauthenticated access from other machines on the network.
 
 ## Quick start
 
@@ -121,7 +122,15 @@ In another terminal:
 ollama pull nomic-embed-text
 ```
 
-### 3. Download and prepare TechQA
+### 3. Start Qdrant
+
+```bash
+make qdrant-up
+```
+
+This starts `qdrant/qdrant:v1.19.1` and waits for its health endpoint before returning.
+
+### 4. Download and prepare TechQA
 
 ```bash
 uv run resolverag dataset prepare \
@@ -141,18 +150,18 @@ data/processed/techqa/
 
 See [the data guide](data/README.md) for provenance and split details.
 
-### 4. Validate indexing on a bounded sample
+### 5. Validate indexing on a bounded sample
 
 ```bash
 uv run resolverag index build \
-  --config configs/indexes/local.yaml \
+  --config configs/indexes/qdrant.yaml \
   --limit 25
 ```
 
 This creates five smoke-test collections. Smoke and full builds use different names, preventing
 a validation run from overwriting benchmark indexes.
 
-### 5. Search a smoke index
+### 6. Search a smoke index
 
 ```bash
 uv run resolverag retrieve search \
@@ -166,7 +175,7 @@ uv run resolverag retrieve search \
 Each result includes its document and chunk IDs, text, final score, and component scores such as
 BM25, dense, fusion, MMR, or cross-encoder scores.
 
-### 6. Validate the complete evaluation workflow
+### 7. Validate the complete evaluation workflow
 
 ```bash
 make benchmark-smoke
@@ -181,14 +190,16 @@ pipeline; it is not a quality benchmark because the relevant documents may not b
 On macOS, keep the machine awake and retain a log:
 
 ```bash
-caffeinate -i make benchmark-overnight 2>&1 | tee overnight-benchmark.log
+caffeinate -i make benchmark-overnight 2>&1 \
+  | tee data/processed/techqa/overnight-benchmark.log
 ```
 
 The evaluator checkpoints every completed query/configuration pair. If evaluation is interrupted
 after indexing has completed, resume it without rebuilding the indexes:
 
 ```bash
-caffeinate -i make benchmark-resume 2>&1 | tee -a overnight-benchmark.log
+caffeinate -i make benchmark-resume 2>&1 \
+  | tee -a data/processed/techqa/overnight-benchmark.log
 ```
 
 Do not rerun `benchmark-overnight` merely to resume evaluation. Rebuilding indexes produces a
@@ -207,6 +218,12 @@ reports/retrieval/full_development/
 
 Only a full-corpus run over the configured matrix and sample size is marked `official`. Smoke
 reports are labeled `VALIDATION ONLY` and excluded from Git.
+
+Stop Qdrant without deleting its persistent indexes when the experiment is finished:
+
+```bash
+make qdrant-down
+```
 
 ## Development
 
@@ -230,6 +247,7 @@ make test-unit
 ```text
 configs/                 Versioned dataset, index, retrieval, and evaluation settings
 data/README.md           Dataset contract, provenance, and leakage policy
+docker-compose.yml       Pinned, loopback-only Qdrant server
 docs/architecture.md     System boundaries and offline/online data flows
 src/resolverag/data/     Download, validation, normalization, and serialization
 src/resolverag/indexing/ Chunking, embedding, Qdrant indexing, and manifests

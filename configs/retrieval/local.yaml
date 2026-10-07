@@ -1,7 +1,7 @@
 schema_version: 1
 
 inputs:
-  index_config_file: configs/indexes/local.yaml
+  index_config_file: configs/indexes/qdrant.yaml
   index_manifest_file: data/processed/techqa/indexes/full/manifest.json
 
 retrieval:

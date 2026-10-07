@@ -181,9 +181,9 @@ def build_index_command(
             exists=True,
             dir_okay=False,
             readable=True,
-            help="Chunking and local-index configuration.",
+            help="Chunking and Qdrant index configuration.",
         ),
-    ] = Path("configs/indexes/local.yaml"),
+    ] = Path("configs/indexes/qdrant.yaml"),
     strategy: Annotated[
         list[ChunkingStrategy] | None,
         typer.Option(

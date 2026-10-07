@@ -14,6 +14,7 @@ from resolverag.domain.models import (
 from resolverag.exceptions import RetrievalError
 from resolverag.indexing.config import IndexConfig, load_index_config
 from resolverag.indexing.models import CollectionBuild, IndexBuildManifest
+from resolverag.indexing.qdrant import create_qdrant_client
 from resolverag.retrieval.base import PassageReranker, QueryEmbedder, Retriever
 from resolverag.retrieval.config import RetrievalConfig, load_retrieval_config
 from resolverag.retrieval.dense import DenseRetriever
@@ -88,7 +89,9 @@ class RetrievalRuntime:
             != self.index_config.embedding.expected_dimensions
         ):
             raise RetrievalError("Index manifest and configuration disagree on vector dimensions")
-        if self.index_manifest.qdrant_path != str(self.index_config.qdrant.path):
+        if self.index_manifest.qdrant_mode != self.index_config.qdrant.mode:
+            raise RetrievalError("Index manifest points to a different Qdrant backend")
+        if self.index_manifest.qdrant_location != self.index_config.qdrant.location:
             raise RetrievalError("Index manifest points to a different Qdrant database")
 
     def _find_collection(self, strategy: ChunkingStrategy) -> CollectionBuild:
@@ -122,7 +125,7 @@ class RetrievalRuntime:
             if self._provided_client is not None:
                 self._client = self._provided_client
             else:
-                self._client = QdrantClient(path=str(self.index_config.qdrant.path))
+                self._client = create_qdrant_client(self.index_config.qdrant)
                 self._owns_client = True
             if not self._client.collection_exists(self.collection.collection_name):
                 raise RetrievalError(
@@ -206,7 +209,7 @@ class RetrievalRuntime:
         return self._retriever(configuration).retrieve(normalized_query, result_count)
 
     def close(self) -> None:
-        """Release a locally owned Qdrant database handle."""
+        """Release an internally owned Qdrant client."""
 
         if self._owns_client and self._client is not None:
             self._client.close()

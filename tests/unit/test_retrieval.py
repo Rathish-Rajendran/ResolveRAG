@@ -110,6 +110,7 @@ def _runtime_files(tmp_path: Path, client: QdrantClient) -> tuple[Path, Path, li
             "query_prefix": "search_query: ",
         },
         "qdrant": {
+            "mode": "local",
             "path": str(tmp_path / "qdrant"),
             "collection_prefix": "test",
             "distance": "cosine",
@@ -175,7 +176,8 @@ def _runtime_files(tmp_path: Path, client: QdrantClient) -> tuple[Path, Path, li
         embedding_provider="ollama",
         embedding_model="fake-embedding",
         embedding_dimensions=3,
-        qdrant_path=str(tmp_path / "qdrant"),
+        qdrant_mode="local",
+        qdrant_location=str(tmp_path / "qdrant"),
         collections=(collection,),
     )
     index_manifest_path = output_directory / "manifest.json"

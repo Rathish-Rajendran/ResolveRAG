@@ -46,7 +46,7 @@ ResolveRAG currently depends on:
 
 - Hugging Face for the pinned NVIDIA distribution of IBM TechQA.
 - Ollama and `nomic-embed-text` for local dense embeddings.
-- Qdrant embedded mode for persistent vector collections and payloads.
+- a pinned Qdrant server container for persistent vector collections and payloads.
 - `rank-bm25` for sparse retrieval.
 - a sentence-transformers cross-encoder for reranking.
 - LangChain model and text-splitting integrations at provider boundaries.
@@ -151,7 +151,7 @@ data/processed/techqa/queries.jsonl      Evaluation queries and reference answer
 data/processed/techqa/qrels.jsonl        Query-to-document relevance judgments
 data/processed/techqa/manifest.json      Dataset provenance and integrity metadata
 data/processed/techqa/indexes/*/          Index manifests and chunk artifacts
-qdrant_storage/                           Local persistent vector database
+qdrant_storage/                           Docker-mounted Qdrant server storage
 reports/retrieval/*/                      Checkpoints, leaderboard, summary, winner
 ```
 
@@ -165,7 +165,8 @@ remain auditable.
 - Normalization fails on schema drift, duplicate query IDs, split violations, or inconsistent
   answerability labels.
 - Index creation fails on an unexpected embedding dimension.
-- Retrieval refuses an incompatible index configuration, model, dimension, path, or chunk hash.
+- Retrieval refuses an incompatible index configuration, model, dimension, backend, location,
+  or chunk hash.
 - Evaluation records individual retrieval failures without discarding completed work.
 - Resume refuses to combine results from different provenance fingerprints.
 

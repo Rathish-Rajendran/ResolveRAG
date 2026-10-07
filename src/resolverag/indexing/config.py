@@ -33,11 +33,38 @@ class EmbeddingSettings(StrictIndexConfigModel):
 
 
 class QdrantSettings(StrictIndexConfigModel):
-    path: Path
+    mode: Literal["local", "server"]
+    path: Path | None = None
+    url: str | None = Field(default=None, min_length=1)
+    prefer_grpc: bool = True
+    timeout_seconds: int = Field(default=120, gt=0)
     collection_prefix: str = Field(min_length=1, pattern=r"^[a-z0-9_]+$")
     distance: Literal["cosine"]
     embedding_batch_size: int = Field(gt=0)
     upload_batch_size: int = Field(gt=0)
+
+    @model_validator(mode="after")
+    def validate_location(self) -> "QdrantSettings":
+        """Require exactly the location used by the selected backend."""
+
+        if self.mode == "local":
+            if self.path is None or self.url is not None:
+                raise ValueError("local Qdrant mode requires path and forbids url")
+        elif self.url is None or self.path is not None:
+            raise ValueError("server Qdrant mode requires url and forbids path")
+        return self
+
+    @property
+    def location(self) -> str:
+        """Return a stable location string for clients and provenance."""
+
+        if self.mode == "local":
+            if self.path is None:  # pragma: no cover - enforced by validation
+                raise ValueError("Local Qdrant path is missing")
+            return str(self.path)
+        if self.url is None:  # pragma: no cover - enforced by validation
+            raise ValueError("Qdrant server URL is missing")
+        return self.url
 
 
 class TokenizerSettings(StrictIndexConfigModel):

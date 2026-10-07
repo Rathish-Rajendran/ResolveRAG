@@ -16,7 +16,10 @@ embedding:
   query_prefix: "search_query: "
 
 qdrant:
-  path: qdrant_storage
+  mode: server
+  url: http://127.0.0.1:6333
+  prefer_grpc: true
+  timeout_seconds: 120
   collection_prefix: resolverag_techqa
   distance: cosine
   embedding_batch_size: 64

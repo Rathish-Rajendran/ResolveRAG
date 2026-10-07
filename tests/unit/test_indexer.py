@@ -107,6 +107,7 @@ def _index_config(tmp_path: Path) -> tuple[Path, dict[str, Any]]:
             "query_prefix": "search_query: ",
         },
         "qdrant": {
+            "mode": "local",
             "path": str(tmp_path / "qdrant"),
             "collection_prefix": "test_techqa",
             "distance": "cosine",
@@ -201,3 +202,18 @@ def test_index_config_requires_all_benchmark_strategies(tmp_path: Path) -> None:
 
     with pytest.raises(ConfigurationError, match="missing strategies"):
         load_index_config(config_path)
+
+
+def test_index_config_requires_location_for_selected_qdrant_mode(tmp_path: Path) -> None:
+    config_path, config_data = _index_config(tmp_path)
+    config_data["qdrant"].pop("path")
+    config_path.write_text(yaml.safe_dump(config_data), encoding="utf-8")
+
+    with pytest.raises(ConfigurationError, match="requires path"):
+        load_index_config(config_path)
+
+    config_data["qdrant"]["mode"] = "server"
+    config_data["qdrant"]["url"] = "http://127.0.0.1:6333"
+    config_path.write_text(yaml.safe_dump(config_data), encoding="utf-8")
+
+    assert load_index_config(config_path).qdrant.location == "http://127.0.0.1:6333"

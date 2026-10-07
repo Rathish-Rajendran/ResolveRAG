@@ -1,6 +1,7 @@
 """Provenance models for reproducible index builds."""
 
 from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -44,5 +45,6 @@ class IndexBuildManifest(IndexModel):
     embedding_provider: str = Field(min_length=1)
     embedding_model: str = Field(min_length=1)
     embedding_dimensions: int = Field(gt=0)
-    qdrant_path: str = Field(min_length=1)
+    qdrant_mode: Literal["local", "server"]
+    qdrant_location: str = Field(min_length=1)
     collections: tuple[CollectionBuild, ...]

@@ -30,6 +30,7 @@ from resolverag.indexing.models import (
     CollectionBuild,
     IndexBuildManifest,
 )
+from resolverag.indexing.qdrant import create_qdrant_client
 
 
 class EmbeddingProvider(Protocol):
@@ -305,7 +306,7 @@ def build_indexes(
     output_directory = config.outputs.directory / scope
     output_directory.mkdir(parents=True, exist_ok=True)
     owns_client = client is None
-    qdrant_client = client or QdrantClient(path=str(config.qdrant.path))
+    qdrant_client = client or create_qdrant_client(config.qdrant)
     try:
         collections = tuple(
             _build_collection(
@@ -334,7 +335,8 @@ def build_indexes(
         embedding_provider=config.embedding.provider,
         embedding_model=config.embedding.model,
         embedding_dimensions=dimensions,
-        qdrant_path=str(config.qdrant.path),
+        qdrant_mode=config.qdrant.mode,
+        qdrant_location=config.qdrant.location,
         collections=collections,
     )
     manifest_path = output_directory / "manifest.json"

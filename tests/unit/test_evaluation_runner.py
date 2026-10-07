@@ -128,7 +128,8 @@ def _benchmark_config(tmp_path: Path) -> tuple[Path, Path]:
         embedding_provider="ollama",
         embedding_model="fake",
         embedding_dimensions=3,
-        qdrant_path=str(tmp_path / "qdrant"),
+        qdrant_mode="local",
+        qdrant_location=str(tmp_path / "qdrant"),
         collections=tuple(_collection(strategy) for strategy in strategies),
     )
     index_manifest_path = tmp_path / "index-manifest.json"
